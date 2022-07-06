@@ -2,6 +2,9 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+// env
+import { ENV } from '@config/env';
+
 // interceptors
 import { FormatResponseInterceptor } from './common/interceptors';
 
@@ -15,7 +18,12 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix('api/v1'); // for global prefix
+  app.enableCors({
+    credentials: true,
+    origin: '*',
+  });
+
+  app.setGlobalPrefix(ENV.APP_VERSION); // for global prefix
 
   app.useGlobalPipes(new ValidationPipe()); // Validation With DTOs'
 
@@ -35,14 +43,14 @@ async function bootstrap() {
     SwaggerModule.createDocument(
       app,
       new DocumentBuilder()
-        .setTitle('ACL')
-        .setDescription('ACL API Service')
+        .setTitle('Auth API')
+        .setDescription('AUTH API Service')
         .setVersion('1.0')
-        .addTag('ACL')
+        .addTag('AUTH')
         .build(),
     ),
   );
 
-  await app.listen(process.env.PORT || process.env.APPLICATION_PORT || 3001);
+  await app.listen(process.env.PORT || ENV.APPLICATION_PORT || 3001);
 }
 bootstrap();
