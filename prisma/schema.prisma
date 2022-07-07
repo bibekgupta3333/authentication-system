@@ -11,6 +11,121 @@ generator client {
   previewFeatures = ["interactiveTransactions", "fullTextSearch", "referentialIntegrity"]
 }
 
+// | Organization |
+model Organization {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  logo String?
+
+  taxId       String?
+  companyId   String?
+  phoneNumber String?
+
+  city   String?
+  street String?
+
+
+  state   String?
+  country String?
+  zipCode String?
+
+  profiles Profile[]
+}
+
+// | Profile |
+
 model Profile {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstName  String
+  lastName   String
+  password   String
+  lastLogin  DateTime?
+  dateJoined DateTime? @default(now())
+
+  avatar              String?
+  email               String               @unique
+  isActive            Boolean?             @default(false)
+  isFirstPasswordSet  Boolean?             @default(false)
+  isEmailSet          Boolean?             @default(false)
+  isEmailVerified     Boolean?             @default(false)
+  authority           String?
+  organization        Organization         @relation(fields: [organizationId], references: [id])
+  phoneNumber         String?
+  organizationId      String
+  profileMetadata     ProfileMetadata[]
+  socialAccounts      SocialAccount[]
+  networkInformations NetworkInformation[]
+  sessions            Sessions[]
+}
+
+// | ProfileMetadata |
+model ProfileMetadata {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  profile           Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  isProfileComplete Boolean  @default(false)
+  profileId         String   @unique
+}
+
+// | Social Accounts |
+enum SocialProviders {
+  FACEBOOK
+  GOOGLE
+  APPLE
+  GITHUB
+  GITLAB
+}
+
+model SocialAccount {
+  id               String          @id @default(cuid())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  profile          Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  provider         SocialProviders @default(GOOGLE)
+  providerUserId   String
+  providerResponse Json            @default("{}")
+  profileId        String
+
+  @@unique([providerUserId, provider])
+}
+
+//  | Sessions |
+model Sessions {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessionData Json @default("{}")
+
+  expiredAt           DateTime
+  profile             Profile              @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  networkInformations NetworkInformation[]
+  profileId           String
+}
+
+// | Network Manager |
+model NetworkInformation {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  profile           Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  session           Sessions @relation(fields: [sessionsId], references: [id], onDelete: Cascade)
+  sessionsId        String
+  ipAddress         String
+  os                String
+  browser           String
+  country           String   @default("-")
+  countryCode       String   @default("-")
+  city              String   @default("-")
+  state             String   @default("-")
+  tzOffset          String   @default("00:00")
+  parsedInformation Json     @default("{}")
+  profileId         String
 }
