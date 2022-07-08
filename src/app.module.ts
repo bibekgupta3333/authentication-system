@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 
 // modules
 import { PaginationModule } from './common/pagination/pagination.module';
+import { ProfileModule } from './apps/profile/profile.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PaginationModule } from './common/pagination/pagination.module';
       },
     }),
     PaginationModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [],
