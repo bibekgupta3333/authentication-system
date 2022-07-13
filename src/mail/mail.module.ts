@@ -25,7 +25,7 @@ import { ENV } from '@config/env';
         },
       },
       defaults: {
-        from: "'No Reply' <noreply@fastaccount.com>",
+        from: "'No Reply' <noreply@auth.com>",
       },
       template: {
         dir: join(process.cwd(), 'src', 'mail', 'templates'),

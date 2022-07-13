@@ -15,6 +15,7 @@ export class MailService {
     private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
   ) {}
+
   async sendResetPasswordEmail({
     email,
     resetToken,
