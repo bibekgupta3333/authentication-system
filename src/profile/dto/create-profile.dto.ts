@@ -21,5 +21,4 @@ export class CreateProfileDto implements Partial<Profile> {
   isEmailVerified?: boolean;
 
   phoneNumber?: string;
-  // organizationId: string;
 }

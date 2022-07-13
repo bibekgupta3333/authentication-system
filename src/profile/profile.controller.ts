@@ -1,29 +1,48 @@
+// nest
 import {
-  Controller,
   Get,
+  Put,
   Post,
   Body,
   Patch,
   Param,
-  Delete,
   Query,
-  Put,
+  Delete,
   UseGuards,
+  Controller,
   BadRequestException,
 } from '@nestjs/common';
-import { ProfileService } from './profile.service';
-import { UpdatePasswordDto, UpdateProfileDto } from './dto/update-profile.dto';
-import { AuthContext } from '@src/common/decorators';
-import { ReadOnlyProfileEntity } from './entities/profile.entity';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+// guards
 import { JwtAuthGuard } from '@src/auth/guards';
+
+// utils
 import { checkPassword } from '@src/auth/utils';
 
+// services
+import { ProfileService } from './profile.service';
+
+// decorator
+import { AuthContext } from '@src/common/decorators';
+
+// entity
+import { ProfileEntity } from './entities/profile.entity';
+import { ReadOnlyProfileEntity } from './entities/profile.entity';
+
+// dto
+import { UpdatePasswordDto, UpdateProfileDto } from './dto/update-profile.dto';
+
 @Controller('profile')
+@ApiTags('Profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get(['', ':id'])
+  @ApiResponse({
+    status: 200,
+    type: ProfileEntity,
+  })
   @UseGuards(JwtAuthGuard)
   async findOne(
     @Param('id') id: string,
@@ -44,6 +63,10 @@ export class ProfileController {
   }
 
   @Patch(['', ':id'])
+  @ApiResponse({
+    status: 200,
+    type: ProfileEntity,
+  })
   @ApiBody({ type: UpdateProfileDto })
   @UseGuards(JwtAuthGuard)
   partialUpdate(
@@ -58,6 +81,10 @@ export class ProfileController {
   }
 
   @Put(['', ':id'])
+  @ApiResponse({
+    status: 200,
+    type: ProfileEntity,
+  })
   @ApiBody({ type: UpdateProfileDto })
   @UseGuards(JwtAuthGuard)
   update(
@@ -80,6 +107,10 @@ export class ProfileController {
   }
 
   @Post('update-password')
+  @ApiResponse({
+    status: 200,
+    type: ProfileEntity,
+  })
   @UseGuards(JwtAuthGuard)
   updatePassword(
     @AuthContext('profile') profile: TProfile,
