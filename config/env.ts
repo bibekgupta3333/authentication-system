@@ -4,7 +4,7 @@ config();
 
 export const ENV = {
   APPLICATION_PORT: process.env.APPLICATION_PORT ?? 3000,
-  APP_VERSION: 'api/v2',
+  APP_VERSION: 'api/v1',
   APP_SECRET:
     process.env.APP_SECRET ??
     'XMViKBFv5Mv-BoginpMTMA4MVWiqFnQgRc5Vu-YrpIGIdVN0L4y8jFWVx_hSpDYjB-A',
