@@ -5,6 +5,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 // env
 import { ENV } from '@config/env';
 
+// Third Party
+import ExpressCookieParser from 'cookie-parser';
+
 // interceptors
 import { FormatResponseInterceptor } from './common/interceptors';
 
@@ -24,7 +27,7 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix(ENV.APP_VERSION); // for global prefix
-
+  app.use(ExpressCookieParser());
   app.useGlobalPipes(new ValidationPipe()); // Validation With DTOs'
 
   app.useGlobalInterceptors(
@@ -47,6 +50,7 @@ async function bootstrap() {
         .setDescription('AUTH API Service')
         .setVersion('1.0')
         .addTag('AUTH')
+        .addCookieAuth(ENV.APP_ACCESS_TOKEN)
         .build(),
     ),
   );
