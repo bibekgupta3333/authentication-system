@@ -1,6 +1,7 @@
 //  nest
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'nestjs-prisma';
+import { ConfigModule } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
 
 // controllers
@@ -8,7 +9,12 @@ import { AppController } from './app.controller';
 
 // modules
 import { PaginationModule } from './common/pagination/pagination.module';
-import { ProfileModule } from './apps/profile/profile.module';
+import { ProfileModule } from './profile/profile.module';
+import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
+
+// config
+import ApplicationEnvironment from '@config/env';
 
 @Module({
   imports: [
@@ -20,16 +26,18 @@ import { ProfileModule } from './apps/profile/profile.module';
             process.env.NODE_ENV === 'production'
               ? ['info', 'query', 'error', 'warn']
               : ['info', 'query', 'error', 'warn'],
-
-          rejectOnNotFound: {
-            findUnique: () => new BadRequestException('Resource Not Found'),
-          },
         },
         explicitConnect: true,
       },
     }),
+    ConfigModule.forRoot({
+      load: [ApplicationEnvironment],
+      isGlobal: true,
+    }),
     PaginationModule,
     ProfileModule,
+    AuthModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [],
