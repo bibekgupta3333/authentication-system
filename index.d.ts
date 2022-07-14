@@ -1,5 +1,13 @@
+type ExpressRequestWith<T> = TExpressRequest & { user: T };
+type TProfile = import('@prisma/client').Profile;
+type TOrganization = import('@prisma/client').Organization;
+type TSessions = import('@prisma/client').Sessions;
+type TAuthContext = {
+  profile: TProfile;
+  organization?: TOrganization;
+  session?: TSessions;
+};
 type TExpressRequest = import('express').Request;
-
 type Paginated<T> = {
   results: T[];
   metadata: {

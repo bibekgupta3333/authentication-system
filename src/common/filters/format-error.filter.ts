@@ -19,6 +19,10 @@ function formatError(error: string | Record<string, any>): Record<string, any> {
     return {
       message: error,
     };
+
+  return {
+    ...omit(error, 'statusCode'),
+  };
 }
 
 @Catch(HttpException)
