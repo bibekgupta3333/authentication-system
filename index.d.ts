@@ -7,7 +7,18 @@ type TAuthContext = {
   organization?: TOrganization;
   session?: TSessions;
 };
+
+type ThirdPartyLoginUser = {
+  email?: string;
+  uid: string;
+  avatarUrl?: string;
+  rawResponse: Record<string, any>;
+  refreshToken?: string;
+  accessToken?: string;
+};
+
 type TExpressRequest = import('express').Request;
+
 type Paginated<T> = {
   results: T[];
   metadata: {
