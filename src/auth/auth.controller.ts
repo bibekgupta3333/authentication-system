@@ -8,6 +8,7 @@ import {
   UseGuards,
   Req,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 
 // services
@@ -18,10 +19,20 @@ import {
   ResetPasswordDto,
   RegisterWithEmailDto,
   InitiateResetPasswordDto,
+  RegisterWithGithubDto,
+  RegisterWithGitlabDto,
+  RegisterWithMicrosoftDto,
 } from './dto';
 
 // guards
-import { JwtAuthGuard, LocalAuthGuard, JwtRefreshGuard } from './guards';
+import {
+  JwtAuthGuard,
+  LocalAuthGuard,
+  JwtRefreshGuard,
+  GithubAuthGuard,
+  GitlabAuthGuard,
+  MicrosoftAuthGuard,
+} from './guards';
 
 // decorators
 import { AuthContext } from '@src/common/decorators';
@@ -32,10 +43,18 @@ import {
   TokenResponse,
 } from './entites/response.entity';
 
+// services
+import { SocialAccountsService } from '@src/profile/social-accounts/social-account.service';
+
 @Controller('auth')
 @ApiTags('Authentication')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly socialService: SocialAccountsService,
+  ) {}
+
+  //#region Login
 
   @ApiResponse({
     status: 201,
@@ -51,6 +70,40 @@ export class AuthController {
     return await this.authService.authenticateRequest(req, profile);
   }
 
+  @ApiBody({ type: RegisterWithGithubDto })
+  @UseGuards(GithubAuthGuard)
+  @Post('login/github')
+  async loginWithGithub(
+    @Req() req: TExpressRequest,
+    @AuthContext('profile') profile: TProfile,
+  ) {
+    return await this.authService.authenticateRequest(req, profile);
+  }
+
+  @ApiBody({ type: RegisterWithGitlabDto })
+  @UseGuards(GitlabAuthGuard)
+  @Post('login/gitlab')
+  async loginWithGitlab(
+    @Req() req: TExpressRequest,
+    @AuthContext('profile') profile: TProfile,
+  ) {
+    return await this.authService.authenticateRequest(req, profile);
+  }
+
+  @ApiBody({ type: RegisterWithMicrosoftDto })
+  @UseGuards(MicrosoftAuthGuard)
+  @Post('login/microsoft')
+  async loginWithMicrosoft(
+    @Req() req: TExpressRequest,
+    @AuthContext('profile') profile: TProfile,
+  ) {
+    return await this.authService.authenticateRequest(req, profile);
+  }
+
+  //#endregion
+
+  //#region Registration
+
   @ApiResponse({
     status: 201,
     type: TokenResponse,
@@ -63,6 +116,86 @@ export class AuthController {
     const profile = await this.authService.registerWithEmail(registrationData);
     return await this.authService.authenticateRequest(req, profile);
   }
+
+  @ApiBody({ type: RegisterWithGithubDto })
+  @UseGuards(GithubAuthGuard)
+  @Post('register/github')
+  async registerWithGithub(
+    @Req() req: TExpressRequest,
+    @AuthContext('profile') existingProfile: TProfile,
+  ) {
+    if (existingProfile) throw new BadRequestException('User Already Exists!');
+
+    const profile = await this.authService.registerWithGithub(
+      req.authInfo as ThirdPartyLoginUser,
+    );
+
+    return await this.authService.authenticateRequest(req, profile);
+  }
+
+  @ApiBody({ type: RegisterWithGitlabDto })
+  @UseGuards(GitlabAuthGuard)
+  @Post('register/gitlab')
+  async registerWithGitlab(
+    @Req() req: TExpressRequest,
+    @AuthContext('profile') existingProfile: TProfile,
+  ) {
+    if (existingProfile) throw new BadRequestException('User Already Exists!');
+
+    const profile = await this.authService.registerWithGitlab(
+      req.authInfo as ThirdPartyLoginUser,
+    );
+
+    return await this.authService.authenticateRequest(req, profile);
+  }
+
+  @ApiBody({ type: RegisterWithMicrosoftDto })
+  @UseGuards(MicrosoftAuthGuard)
+  @Post('register/microsoft')
+  async registerWithMicrosoft(
+    @Req() req: TExpressRequest,
+    @AuthContext('profile') existingProfile: TProfile,
+  ) {
+    if (existingProfile) throw new BadRequestException('User Already Exists!');
+
+    const profile = await this.authService.registerWithMicrosoft(
+      req.authInfo as ThirdPartyLoginUser,
+    );
+
+    return await this.authService.authenticateRequest(req, profile);
+  }
+
+  //#endregion
+
+  //#region Social Linking
+  @UseGuards(JwtAuthGuard)
+  @Post('link/github')
+  async linkGithub(
+    @AuthContext('profile') profile: TProfile,
+    @Body() github: RegisterWithGithubDto,
+  ) {
+    return await this.socialService.linkToGithub(profile.id, github);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('link/gitlab')
+  async linkGitlab(
+    @AuthContext('profile') profile: TProfile,
+    @Body() gitlab: RegisterWithGitlabDto,
+  ) {
+    return await this.socialService.linkToGitlab(profile.id, gitlab);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('link/microsoft')
+  async linkMicrosoft(
+    @AuthContext('profile') profile: TProfile,
+    @Body() microsoft: RegisterWithMicrosoftDto,
+  ) {
+    return await this.socialService.linkToGitlab(profile.id, microsoft);
+  }
+
+  //#endregion
 
   @ApiResponse({
     status: 200,
