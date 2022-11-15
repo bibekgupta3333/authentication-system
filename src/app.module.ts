@@ -13,6 +13,9 @@ import { ProfileModule } from './profile/profile.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 
+// service
+import { SocialAccountsService } from '@src/profile/social-accounts/social-account.service';
+
 // config
 import ApplicationEnvironment from '@config/env';
 
@@ -40,6 +43,6 @@ import ApplicationEnvironment from '@config/env';
     MailModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [SocialAccountsService],
 })
 export class AppModule {}

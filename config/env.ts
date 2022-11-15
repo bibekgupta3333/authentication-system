@@ -60,8 +60,31 @@ export const ENV = {
       CLIENT_ID: process.env.GOGL_CLIENT_ID,
       CLIENT_SECRET: process.env.GOGL_CLIENT_SECRET,
     },
+    APP_GITHUB: {
+      ENDPOINT: 'https://github.com/login/oauth/access_token',
+      USER_DATA_ENDPOINT: 'https://api.github.com/user',
+      CLIENT_ID: process.env.GH_CLIENT_ID,
+      CLIENT_SECRET: process.env.GH_CLIENT_SECRET,
+    },
+    APP_GITLAB: {
+      ENDPOINT: 'https://gitlab.com/oauth/token',
+      USER_DATA_ENDPOINT: 'https://gitlab.com/api/v4/user',
+      GRANT_TYPE: 'authorization_code',
+      REDIRECT_URI: process.env.GL_REDIRECT_URI,
+      CLIENT_ID: process.env.GL_CLIENT_ID,
+      CLIENT_SECRET: process.env.GL_CLIENT_SECRET,
+    },
+    APP_MICROSOFT: {
+      ENDPOINT: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+      USER_DATA_ENDPOINT: 'https://graph.microsoft.com/v1.0/me/',
+      GRANT_TYPE: 'authorization_code',
+      REDIRECT_URI: process.env.MS_REDIRECT_URI,
+      CLIENT_ID: process.env.MS_CLIENT_ID,
+      CLIENT_SECRET: process.env.MS_CLIENT_SECRET,
+      SCOPE:
+        'openid profile email offline_access https://graph.microsoft.com/User.Read',
+    },
   },
-  //
 };
 
 export default () => ENV;

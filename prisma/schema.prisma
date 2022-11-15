@@ -81,6 +81,7 @@ enum SocialProviders {
   APPLE
   GITHUB
   GITLAB
+  MICROSOFT
 }
 
 model SocialAccount {
