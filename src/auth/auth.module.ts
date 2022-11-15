@@ -15,7 +15,17 @@ import { MailModule } from './../mail/mail.module';
 import { ProfileModule } from '@src/profile/profile.module';
 
 // strategies
-import { JwtRefreshStrategy, JwtStrategy, LocalStrategy } from './strategies';
+import {
+  JwtRefreshStrategy,
+  JwtStrategy,
+  LocalStrategy,
+  GithubStrategy,
+  GitlabStrategy,
+  MicrosoftStrategy,
+} from './strategies';
+
+// services
+import { SocialAccountsService } from '@src/profile/social-accounts/social-account.service';
 
 @Module({
   imports: [MailModule, ProfileModule, PassportModule, JwtModule.register({})],
@@ -23,10 +33,17 @@ import { JwtRefreshStrategy, JwtStrategy, LocalStrategy } from './strategies';
   providers: [
     AuthService,
     AuthJwtService,
+
     // Strategies
     JwtStrategy,
     LocalStrategy,
     JwtRefreshStrategy,
+    GithubStrategy,
+    GitlabStrategy,
+    MicrosoftStrategy,
+
+    // services
+    SocialAccountsService,
   ],
 })
 export class AuthModule {}

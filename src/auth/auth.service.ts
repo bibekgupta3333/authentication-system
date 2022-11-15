@@ -33,6 +33,7 @@ export class AuthService {
     private readonly profileService: ProfileService,
   ) {}
 
+  //#region Registration
   async register({ email, password }: RegisterWithEmailDto) {
     const [profileId] = generateCuids(1);
 
@@ -60,6 +61,85 @@ export class AuthService {
     const profile = await this.register({ email, password });
     return profile;
   }
+
+  async registerWithGithub(githubRegistration: ThirdPartyLoginUser) {
+    const [password] = generateCuids(1);
+    const { email, id } = await this.register({
+      email: githubRegistration.email,
+      password,
+    });
+
+    const profile = await this.prisma.profile.update({
+      where: { id },
+      data: {
+        isActive: false,
+        isFirstPasswordSet: false,
+        avatar: githubRegistration?.avatarUrl ?? '',
+        socialAccounts: {
+          create: {
+            provider: 'GITHUB',
+            providerUserId: githubRegistration.uid,
+            providerResponse: githubRegistration,
+          },
+        },
+      },
+    });
+
+    return profile;
+  }
+
+  async registerWithGitlab(gitlabRegistration: ThirdPartyLoginUser) {
+    const [password] = generateCuids(1);
+    const { email, id } = await this.register({
+      email: gitlabRegistration.email,
+      password,
+    });
+
+    const profile = await this.prisma.profile.update({
+      where: { id },
+      data: {
+        isActive: true,
+        isFirstPasswordSet: false,
+        avatar: gitlabRegistration?.avatarUrl ?? '',
+        socialAccounts: {
+          create: {
+            provider: 'GITLAB',
+            providerUserId: gitlabRegistration.uid,
+            providerResponse: gitlabRegistration,
+          },
+        },
+      },
+    });
+
+    return profile;
+  }
+
+  async registerWithMicrosoft(microsoftRegistration: ThirdPartyLoginUser) {
+    const [password] = generateCuids(1);
+    const { email, id } = await this.register({
+      email: microsoftRegistration.email,
+      password,
+    });
+
+    const profile = await this.prisma.profile.update({
+      where: { id },
+      data: {
+        isActive: true,
+        isFirstPasswordSet: false,
+        // avatar: microsoftRegistration?.avatarUrl ?? '',
+        socialAccounts: {
+          create: {
+            provider: 'MICROSOFT',
+            providerUserId: microsoftRegistration.uid,
+            providerResponse: microsoftRegistration,
+          },
+        },
+      },
+    });
+
+    return profile;
+  }
+  //#endregion
 
   async authenticateRequest(request: Request, profile: TProfile) {
     const { res } = request;
@@ -162,7 +242,6 @@ export class AuthService {
   }
 
   async getRefreshToken(token: string) {
-    console.log(this.jwtService.verify(token));
     const session = await this.prisma.sessions.findFirst({
       where: {
         sessionData: {
