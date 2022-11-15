@@ -5,6 +5,9 @@ import { PrismaService } from 'nestjs-prisma';
 // utils
 import { hashPassword } from './utils/password';
 
+// prisma
+import { SocialProviders } from '@prisma/client';
+
 // dto
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -75,5 +78,26 @@ export class ProfileService {
 
   remove(id: string) {
     return this.prisma.profile.delete({ where: { id } });
+  }
+
+  async findForSocialAccount(
+    providerUserId: string,
+    provider: SocialProviders,
+  ) {
+    try {
+      const profile = await this.prisma.profile.findFirst({
+        where: {
+          socialAccounts: {
+            every: {
+              provider,
+              providerUserId,
+            },
+          },
+        },
+      });
+      return profile;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
